@@ -1,15 +1,61 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>AR.js A-Frame Location-based</title>
-<script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
-<script type='text/javascript' src='https://raw.githack.com/AR-js-org/AR.js/master/three.js/build/ar-threex-location-only.js'></script>
-<script type='text/javascript' src='https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js'></script>
+  <title>AR.js A-Frame Orientation</title>
+  <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
+  <script type='text/javascript' src='https://raw.githack.com/AR-js-org/AR.js/master/three.js/build/ar-threex-location-only.js'></script>
+  <script type='text/javascript' src='https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js'></script>
+  <script type="text/javascript">
+    function getDirection(rotationY) {
+      // 将弧度转换为度数
+      let degrees = rotationY * (180 / Math.PI);
+
+      // 确保角度在0到360度之间
+      degrees = (degrees + 360) % 360;
+
+      if (degrees >= 315 || degrees < 45) {
+        return '北';
+      } else if (degrees >= 45 && degrees < 135) {
+        return '东';
+      } else if (degrees >= 135 && degrees < 225) {
+        return '南';
+      } else {
+        return '西';
+      }
+    }
+
+    function updateDirection() {
+      const camera = document.querySelector('a-camera');
+      const rotation = camera.object3D.rotation;
+      const direction = getDirection(rotation.y);
+
+      document.getElementById('direction').innerText = `摄像机朝向: ${direction}`;
+    }
+
+    window.onload = function () {
+      setInterval(updateDirection, 1000); // 每秒更新一次方向
+    }
+  </script>
+  <style>
+    #direction {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      padding: 10px;
+      background-color: rgba(255, 255, 255, 0.7);
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 18px;
+      z-index: 1; /* 确保文本在AR场景上方 */
+    }
+  </style>
 </head>
 <body>
+
 <a-scene vr-mode-ui='enabled: false' arjs='sourceType: webcam; videoTexture: true; debugUIEnabled: false' renderer='antialias: true; alpha: true'>
-    <a-camera gps-new-camera='gpsMinDistance: 5'></a-camera>
-    <a-entity material='color: red' geometry='primitive: box' gps-new-entity-place="latitude: 51.45618; longitude: -2.60295" scale="100 100 100"></a-entity>
+  <a-camera gps-new-camera='gpsMinDistance: 0.1'></a-camera>
 </a-scene>
+<div id="direction">摄像机朝向: 未知</div>
+
 </body>
 </html>
